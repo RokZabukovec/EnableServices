@@ -91,7 +91,7 @@ public class EnableServices {
                         }
                     }
                     break;
-                case 401:
+                case HttpsURLConnection.HTTP_UNAUTHORIZED:
                     System.out.println("Unautherized request!");
                     break;
                 case HttpsURLConnection.HTTP_BAD_REQUEST:
@@ -121,7 +121,6 @@ public class EnableServices {
             this.customerSupport = true;
         }
     }
-
     public boolean isSupportWorking(String timezone) {
         // Time zone codes
         final ZoneId supportTeamLocation = ZoneId.of("Europe/Ljubljana");

@@ -4,35 +4,38 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.awt.*;
+import org.springframework.http.*;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ServerErrorException;
 
 @RestController
 public class EnableServicesController {
 
     @RequestMapping(value = "/api/services", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String services(@RequestParam(value = "timezone") String timezone,
-            @RequestParam(value = "userid") String userid, @RequestParam(value = "cc") String cc)
+    public ResponseEntity<String> services(@RequestParam(value = "timezone") String timezone,
+                                           @RequestParam(value = "userid") String userid,
+                                           @RequestParam(value = "cc") String cc)
             throws JsonProcessingException {
-        EnableServices services = new EnableServices();
-        services.setMultiplayer(userid, cc);
-        services.setAds(cc);
-        services.setCustomerSupport(timezone);
 
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-        String jsonString = mapper.writeValueAsString(services);
-        return jsonString;
-    }
+            EnableServices services = new EnableServices();
+            services.setMultiplayer(userid, cc);
+            services.setAds(cc);
+            services.setCustomerSupport(timezone);
 
-    @RequestMapping(value = "/hello", produces = MediaType.TEXT_HTML_VALUE)
-    public String services() throws JsonProcessingException {
-        String hello = "Hello";
-        return hello;
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+            String jsonString = mapper.writeValueAsString(services);
+
+            return new ResponseEntity<String>(jsonString, HttpStatus.OK);
+        }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<String> handleMissingParams(MissingServletRequestParameterException ex) {
+        String name = ex.getParameterName();
+        String missingParameters = "{\"status\": 400, \"message\": \"Missing parameter " + name + "\"}";
+        return new ResponseEntity<String>(missingParameters, HttpStatus.BAD_REQUEST);
+
     }
 
 }

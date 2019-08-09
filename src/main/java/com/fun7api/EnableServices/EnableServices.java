@@ -56,7 +56,7 @@ public class EnableServices {
      */
     public void setAds(String countryCode) {
         if (this.isValidCountryCode(countryCode)) {
-            final String API_URL = "https://us-central1-o7tools.cloudfunctions.net/fun7-ad-partner?countryCode="
+            final String API_URL = "https://us-central1-o7tools.cloudfunctions.net/fun7-ad-partner"
                     + countryCode;
             final String REQUEST_METHOD = "GET";
             final String USERNAME = "fun7user";

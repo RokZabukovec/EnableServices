@@ -17,14 +17,13 @@ public class DataStore{
     }
 
 
-    public User createUser(String userid, int numOfApiCalls) {
+    public Long createUser(Entity userEntity) {
         try{
-            User newUser = new User(userid, numOfApiCalls);
-            Entity userEntity = new Entity(USER_ENTITY);  // Key will be assigned once written
-            userEntity.setProperty(User.USER_ID, newUser.getUserid());
-            userEntity.setProperty(User.NUMBER_OF_API_CALLS, newUser.getNumberOfCalls());
+             // Key will be assigned once written
+            userEntity.setProperty(User.USER_ID, userEntity.getProperty("userid"));
+            userEntity.setProperty(User.NUMBER_OF_API_CALLS, 1);
             Key userKey = datastore.put(userEntity); // Save the Entity
-            return newUser;
+            return userKey.getId();
         }catch (DatastoreFailureException e){
             System.out.println("Datastore exception creating a user: " + e.getMessage());
             return null;
@@ -35,34 +34,38 @@ public class DataStore{
 
     }
 
-    public User getUser(String userid){
+
+    public Entity getUser(String userid){
         try{
             Query q = new Query(USER_ENTITY).addFilter("userid", FilterOperator.EQUAL, userid);
             PreparedQuery pq = datastore.prepare(q);
             Entity user = pq.asSingleEntity();
             if(user != null){
-                User foundUser = new User();
-                foundUser.setUserid((String)user.getProperty("userid"));
-                foundUser.setNumberOfCalls(Math.toIntExact((Long) user.getProperty("apiCalls")));
-                return foundUser;
+                return user;
             }else{
-                return this.createUser(userid, 0);
+                Entity userEntity = new Entity(USER_ENTITY);  // Key will be assigned once written
+                userEntity.setProperty(User.USER_ID, userid);
+                userEntity.setProperty(User.NUMBER_OF_API_CALLS, 1);
+                this.createUser(userEntity);
             }
         } catch (DatastoreTimeoutException e) {
-           return null;
-        } catch (Exception e) {
             return null;
         }
-
-
+        return null;
+    }
+    public User entityToUser(Entity entity) {
+        return new User.Builder()
+                .numberOfApiCalls((Long) entity.getProperty(User.NUMBER_OF_API_CALLS))
+                .userId((String) entity.getProperty(User.USER_ID))
+                .build();
     }
 
-    public void updateUser(User user) {
-            Key key = KeyFactory.createKey(USER_ENTITY, user.getUserid());  // From a user, create a Key
-            Entity newUser = new Entity(key);         // Convert user to an Entity
-            newUser.setProperty(User.USER_ID, user.getUserid());
-            newUser.setProperty(User.NUMBER_OF_API_CALLS, user.getNumberOfCalls() + 1);
-            datastore.put(newUser);                   // Update the Entity
+    public void updateUser(String userid){
+        Entity founduser = this.getUser(userid);
+//        Long prevNumOfcalls = user.getNumberOfCalls();
+        Long currentNumOfcalls = Long.sum((Long) founduser.getProperty("apiCalls"), 1);
+        founduser.setProperty("apiCalls", currentNumOfcalls);
+        datastore.put(founduser);
 
     }
 

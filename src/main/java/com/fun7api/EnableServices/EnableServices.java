@@ -1,6 +1,7 @@
 package com.fun7api.EnableServices;
 
 import com.fun7api.EnableServices.models.User;
+import com.google.appengine.api.datastore.Entity;
 import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -8,6 +9,7 @@ import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.Base64;
 import javax.net.ssl.HttpsURLConnection;
+import javax.servlet.ServletException;
 
 import java.io.IOException;
 import java.net.URL;
@@ -46,11 +48,15 @@ public class EnableServices {
     public void setMultiplayer(String userid, String countryCode){
         int numOfApi;
         DataStore db = new DataStore();
-        User user = db.getUser(userid);
+        Entity userEntity = db.getUser(userid);
+        User user = db.entityToUser(userEntity);
+
+        Long numOfApiCalls = user.getNumberOfCalls();
+        System.out.println("Število klicev: " + numOfApiCalls);
         if(user != null){
-            if (user.getNumberOfCalls() < 4) {
-                db.updateUser(user);
-            }else if(user.getNumberOfCalls() >= 4 && countryCode.equals("us")){
+            if (numOfApiCalls < 5) {
+                db.updateUser(userid);
+            }else if(numOfApiCalls >= 5 && countryCode.equals("us")){
                 this.multiplayer = true;
             }
         }

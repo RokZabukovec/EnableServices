@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.fun7api.EnableServices.EnableServicesApplicationTests
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.248 s - in com.fun7api.EnableServices.EnableServicesApplicationTests
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.018 s - in com.fun7api.EnableServices.EnableServicesApplicationTests

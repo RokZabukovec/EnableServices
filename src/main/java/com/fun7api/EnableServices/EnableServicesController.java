@@ -52,7 +52,7 @@ public class EnableServicesController {
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<String> handleMissingParams(MissingServletRequestParameterException ex) {
         String name = ex.getParameterName();
-        String missingParameters = "{\"status\": 400, \"message\": \"Missing parameter., \"parameter\": " + name + "\"}";
+        String missingParameters = "{\"status\": 400, \"message\": Missing parameter\", \"parameter\": " + name + "\"}";
         return new ResponseEntity<String>(missingParameters, HttpStatus.BAD_REQUEST);
 
     }

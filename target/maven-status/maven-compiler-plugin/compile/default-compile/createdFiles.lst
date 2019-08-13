@@ -5,5 +5,4 @@ com/fun7api/EnableServices/DataStore.class
 com/fun7api/EnableServices/models/User$Builder.class
 com/fun7api/EnableServices/EnableServicesApplication.class
 com/fun7api/EnableServices/EnableServices.class
-com/fun7api/EnableServices/Validation/Validation.class
 com/fun7api/EnableServices/models/User$1.class

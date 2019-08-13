@@ -2,16 +2,11 @@ package com.fun7api.EnableServices;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fun7api.EnableServices.Validation.Validation;
 import org.springframework.http.*;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ServerErrorException;
-
-import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -21,11 +16,12 @@ import java.io.IOException;
 @RestController
 public class EnableServicesController {
 
-    @RequestMapping(value = "/api/services", produces = MediaType.APPLICATION_JSON_VALUE)
+
+
+    @GetMapping(value = "/api/services", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> services(@RequestParam(value = "timezone")
                                                @NotBlank(message = "You must provide timezone.")
-                                               @NotNull(message = "Timezone can not be empty.")
-                                                       String timezone ,
+                                               @NotNull(message = "Timezone can not be empty.") String timezone ,
 
                                            @NotBlank(message = "User id can not be empty.")
                                            @NotNull(message = "You must provide a user id.")
@@ -52,9 +48,16 @@ public class EnableServicesController {
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<String> handleMissingParams(MissingServletRequestParameterException ex) {
         String name = ex.getParameterName();
-        String missingParameters = "{\"status\": 400, \"message\": Missing parameter\", \"parameter\": " + name + "\"}";
+
+        String missingParameters = "{\"status\": 400, \"message\": \"Missing parameter\", \"parameter\": \"" + name + "\"}";
         return new ResponseEntity<String>(missingParameters, HttpStatus.BAD_REQUEST);
 
+    }
+
+    @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> index(){
+        String emptyPageResponse = "{\"status\": 204, \"message\": \"The server successfully processed the request and is not returning any content.\"}";
+        return new ResponseEntity<String>(emptyPageResponse, HttpStatus.MULTI_STATUS);
     }
 
 }

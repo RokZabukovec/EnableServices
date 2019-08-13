@@ -11,6 +11,7 @@ public class EnableServicesApplicationTests {
 
 	@Test
 	public void contextLoads() {
+		System.out.println("Test passed.");
 	}
 
 }

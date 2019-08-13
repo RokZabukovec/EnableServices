@@ -201,11 +201,17 @@ public class DataStore containes a constructor:
 #### DataStore: EnableServices.java
 
 EnableServices is a public class which is responsible for manipulation of passed parameters and returning response base on the logic.
+
 **Multiplayer**
+
 Multiplayer is a feature that is available only for more skilled players so it should be enabled if user has used “Fun7” game more than 5 times (based on the number of API calls). Also our multiplayer server infrastructure is located in the US so it should be enabled only if the user comes from the US.
+
 **Customer Support**
+
 Customer support should be enabled only on work days between 9:00 - 15:00 Ljubljana time, because only then support personal is available.
+
 **Ads**
+
 Ads in the game are served by the external partner so this service should be enabled only if our external partner supports user device. And to know it, we must call partner’s public API which is already provided and is secured by basic access authentication (via HTTP header).
 
 Outgoing API request in ads method is using Basic Authentication with username and password.

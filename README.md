@@ -2,7 +2,7 @@
 
 Spring Boot API for Fun7 game backend services: multiplayer, ads and customer support.
 
-The API is built using Java Spring Boot Framework and exposes single endpoint which accepts
+The API is built using Java Spring Boot Framework and exposes a single endpoint which accepts
 three parameters:
 
 - timezone: timezone of the user
@@ -12,7 +12,7 @@ three parameters:
 - API ENDPOINT: {BASE_URL}/api/services?timezone={timezone}&userid={userid}?cc={country code}
 - TYPE_OF_RESPONSE_DATA: JSON {“multiplayer”: true, ”userSupport”: false, “ads”: true}
 
-_INFO_ HTTP request to the API endpoint results in json response with statuses of the game services.
+**END RESULT** HTTP request to the API endpoint results in json response with statuses of the game services.
 
 ## Requirements
 
@@ -65,7 +65,7 @@ Next, you must install the Cloud SDK and then set up a GCP project for App Engin
 1. Clone the repository containing the project
    `git clone https://github.com/RokZabukovec/EnableServices.git`
 
-2. Change to the directory that contains the sample code:
+2. Go to the directory:
 
    `cd EnableServices`
 
@@ -78,6 +78,8 @@ Next, you must install the Cloud SDK and then set up a GCP project for App Engin
 
 2. In your browser navigate to the address url with test parameter data
    <http://localhost:8080?timezone=Europe/London&userid=user1&cc=us>
+   
+   or use [Postman](https://www.getpostman.com/downloads/) - PREFERRED!
 
 ### Deploying and running Fun7 API on App Engine
 
@@ -85,7 +87,7 @@ Next, you must install the Cloud SDK and then set up a GCP project for App Engin
 
    `mvn appengine:deploy`
 
-2. Now the applocation is deployed to Google App Engine server on URL: http://YOUR_PROJECT_ID.appspot.com.
+2. Now the application is deployed to Google App Engine server on URL: http://YOUR_PROJECT_ID.appspot.com.
 
    You can view it by running:
 
@@ -97,7 +99,7 @@ Next, you must install the Cloud SDK and then set up a GCP project for App Engin
 
 In the EnableServiceController class, which is annotated with @Validated and @RestController.
 
-GET request is mapped by the public method services with mathod parameters annotated with @RequestParam. The value of @RequestParam is name of the parameter passed throu URl. Parameters are validated with Anotations @NotBlank, @NotNull and @Size
+GET request is mapped by the public method **services** with method parameters annotated with @RequestParam. The value of @RequestParam is name of the parameter passed thru URl. Parameters are validated with Annotations @NotBlank, @NotNull and @Size
 
 Method return type is ResponseEntity which is a shorthand for creating a response with the body and a status code.
 
@@ -132,7 +134,7 @@ Method return type is ResponseEntity which is a shorthand for creating a respons
 
 #### Models: models/User.java
 
-Containes getter and setters for the users properties:
+Contains getters and setters for the users properties:
 
 ```Java
     private String userid;
@@ -156,7 +158,7 @@ Containes three constructors for generating an object in three different ways:
     public User() {}
 ```
 
-Containes static class Builder which is used in creating user object with chaining methods:
+Contains static class Builder which is used in creating user object with chaining methods:
 
 ```Java
     public static class Builder{
@@ -191,28 +193,37 @@ public class DataStore containes a constructor:
         datastore = DatastoreServiceFactory.getDatastoreService(); // Authorized Datastore service
     }
 ```
-
-- Long createUser(Entity userEntity) - creates a new Entity
+#### Methods
+- public Long createUser(Entity userEntity) - creates a new Entity
 - public Entity getUser(String userid) - returns Entity object from a string userid. If user not found
   it's calling createUser method.
 - public User entityToUser(Entity entity) - uses Builder class for transforming Entity to User object
-- public void newApiCall - updates the users a number of api calls info.
+- public void newApiCall - updates the users number of api calls info.
 
-#### DataStore: EnableServices.java
+#### EnableServices.java
 
-EnableServices is a public class which is responsible for manipulation of passed parameters and returning response base on the logic.
+EnableServices is a public class which is responsible for manipulation of passed parameters and returning a response 
+based on the logic in the next paragraphs:
 
 **Multiplayer**
 
-Multiplayer is a feature that is available only for more skilled players so it should be enabled if user has used “Fun7” game more than 5 times (based on the number of API calls). Also our multiplayer server infrastructure is located in the US so it should be enabled only if the user comes from the US.
+Multiplayer is a feature that is available only for more skilled players so it should be enabled if user has used “Fun7”
+game more than 5 times (based on the number of API calls). Also our multiplayer server infrastructure is located in the 
+US so it should be enabled only if the user comes from the US.
 
 **Customer Support**
 
-Customer support should be enabled only on work days between 9:00 - 15:00 Ljubljana time, because only then support personal is available.
+Customer support should be enabled only on work days between 9:00 - 15:00 Ljubljana time, because only then support 
+personal is available.
 
 **Ads**
 
-Ads in the game are served by the external partner so this service should be enabled only if our external partner supports user device. And to know it, we must call partner’s public API which is already provided and is secured by basic access authentication (via HTTP header).
+FOR OUTGOING HTTP REQUESTS FROM A GOOGLE APP ENGINE YOU MUST ENABLE BILLING ON YOUR ACCOUNT. OTHERWISE IT WILL 
+THROW EXCEPTIONS AS DESCRIBED IN THE GAE DOCS: https://cloud.google.com/appengine/docs/standard/java/issue-requests
+
+Ads in the game are served by the external partner so this service should be enabled only if our external partner 
+supports user device. And to know it, we must call partner’s public API which is already provided and is secured by 
+basic access authentication (via HTTP header).
 
 Outgoing API request in ads method is using Basic Authentication with username and password.
 

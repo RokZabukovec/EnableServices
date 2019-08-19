@@ -53,7 +53,6 @@ public class DataStore{
             }else{
                 Entity userEntity = new Entity(USER_ENTITY);  // Key will be assigned once written
                 userEntity.setProperty(User.USER_ID, userid);
-                userEntity.setProperty(User.NUMBER_OF_API_CALLS, 0);
                 this.createUser(userEntity);
                 return userEntity;
             }

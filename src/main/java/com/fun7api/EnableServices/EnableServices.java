@@ -23,7 +23,6 @@ import java.util.TimeZone;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-
 public class EnableServices {
     private boolean multiplayer;
     private boolean ads;
@@ -36,57 +35,58 @@ public class EnableServices {
     }
 
     /*
-     * Name: setMultiplayer
-     * Description: Changes the default false multiplayer to enabled based on location and number
-     * of API calls fro user.
+     * Name: setMultiplayer Description: Changes the default false multiplayer to
+     * enabled based on location and number of API calls fro user.
      *
      * @param String userID - string representation of user id.
      *
      * @param String countryCode - Country code for where the user makes the call.
      *
      */
-    public void setMultiplayer(String userid, String countryCode){
+    public void setMultiplayer(String userid, String countryCode) {
         DataStore db = new DataStore();
         Entity userEntity = db.getUser(userid);
         User user = db.entityToUser(userEntity);
         Long numOfApiCalls = user.getNumberOfCalls();
-        if(user != null){
+        if (user != null) {
             if (numOfApiCalls < 5) {
                 db.newApiCall(userid);
-            }else if(numOfApiCalls >= 5 && countryCode.equals("us")){
+            } else if (numOfApiCalls >= 5 && countryCode.equals("us")) {
                 this.multiplayer = true;
                 db.newApiCall(userid);
             }
-        }else{
+        } else {
             this.multiplayer = false;
         }
-
 
     }
 
     /*
-     * Name: setAds
-     * Description: Calls partners api endpoint to check if device is supported. Http request
-     * uses basic authentication with username and password.
+     * Name: setAds Description: Calls partners api endpoint to check if device is
+     * supported. Http request uses basic authentication with username and password.
      *
      * @param String countryCode - Country code of the user.
      *
-     * WARNING: For HTTP request to work after its been deployed to Google App Engine you
-     * need to set a billing account. Otherwise the request will return exceptions.
-     *  @throws java.net.UnknownHostException
-     *  @throws java.net.SocketTimeoutException
-     *  @throws java.io.IOException
+     * WARNING: For HTTP request to work after its been deployed to Google App
+     * Engine you need to set a billing account. Otherwise the request will return
+     * exceptions.
+     * 
+     * @throws java.net.UnknownHostException
+     * 
+     * @throws java.net.SocketTimeoutException
+     * 
+     * @throws java.io.IOException
      *
      * @return ResponseEntity<String>
      */
     public ResponseEntity<String> setAds(String countryCode) {
         if (this.isValidCountryCode(countryCode)) {
             // Partners api URI with appended parameter countryCode.
-            final String API_URL = "https://us-central1-o7tools.cloudfunctions.net/fun7-ad-partner?countryCode=" + countryCode;
+            final String API_URL = "https://us-central1-o7tools.cloudfunctions.net/fun7-ad-partner?countryCode="
+                    + countryCode;
             final String REQUEST_METHOD = "GET";
             final String USERNAME = "fun7user";
             final String PASSWORD = "fun7pass";
-
 
             HttpsURLConnection connection = null;
             try {
@@ -97,15 +97,16 @@ public class EnableServices {
                 connection.setRequestMethod(REQUEST_METHOD);
                 connection.setRequestProperty("Accept", "application/json");
                 String usernameColonPassword = USERNAME + ":" + PASSWORD;
-                String basicAuthPayload = "Basic "  + Base64.getEncoder().encodeToString(usernameColonPassword.getBytes());
+                String basicAuthPayload = "Basic "
+                        + Base64.getEncoder().encodeToString(usernameColonPassword.getBytes());
 
                 // Include the HTTP Basic Authentication payload
                 connection.addRequestProperty("Authorization", basicAuthPayload);
 
                 // Read response from web server, which will trigger HTTP Basic Authentication
                 // request to be sent.
-                BufferedReader httpResponseReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-
+                BufferedReader httpResponseReader = new BufferedReader(
+                        new InputStreamReader(connection.getInputStream()));
                 String response;
                 while ((response = httpResponseReader.readLine()) != null) {
                     JSONObject jsonResponse = new JSONObject(response);
@@ -116,18 +117,19 @@ public class EnableServices {
                         }
                     }
                 }
-            } catch(UnknownHostException  | SocketTimeoutException e){
-                System.out.println("You need to set a billing account in Google App Engine.");
-                return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-            } catch(MalformedURLException e) {
+            } catch (UnknownHostException | SocketTimeoutException e) {
+                String response = "You need to set a billing account in Google App Engine.";
+                return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            } catch (MalformedURLException e) {
                 return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             } catch (IOException e) {
                 return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-            }finally {
-                try{
+            } finally {
+                try {
                     connection.disconnect();
-                }catch (NullPointerException e){
-                    System.out.println("Cannot disconnect from HTTP connection.");
+                } catch (NullPointerException e) {
+                    String response = "Cannot disconnect from HTTP connection.";
+                    return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
                 }
 
             }
@@ -136,8 +138,8 @@ public class EnableServices {
     }
 
     /*
-     * Name: setCustomerSupport
-     * Description: Sets the customerSupport property to true if support is working.
+     * Name: setCustomerSupport Description: Sets the customerSupport property to
+     * true if support is working.
      *
      * @param String timezone -
      * http://tutorials.jenkov.com/java-date-time/java-util-timezone.html
@@ -150,8 +152,8 @@ public class EnableServices {
     }
 
     /*
-     * Name: isSupportWorking
-     * Description: Calculates the time in Ljubljana-Slovenia based on the timezone.
+     * Name: isSupportWorking Description: Calculates the time in Ljubljana-Slovenia
+     * based on the timezone.
      *
      * @param String timezone -
      * http://tutorials.jenkov.com/java-date-time/java-util-timezone.html
@@ -162,7 +164,7 @@ public class EnableServices {
     public boolean isSupportWorking(String timezone) {
         // Time zone codes
         final ZoneId supportTeamLocation = ZoneId.of("Europe/Ljubljana");
-        if(isValidTimeZone(timezone)){
+        if (isValidTimeZone(timezone)) {
             ZoneId usersLocation = ZoneId.of(timezone);
             // Calculates the time in Ljubljana based on the time zone of the user.
             LocalDateTime zonetimeLj = LocalDateTime.now(supportTeamLocation);
@@ -171,18 +173,18 @@ public class EnableServices {
             LocalTime timeInLjubljana = LocalTime.from(zonetimeUser.minusHours(diff));
 
             // Customer support working hours.
-            LocalTime  WORK_START = LocalTime.parse("09:00:00", DateTimeFormatter.ofPattern("HH:mm:ss"));
+            LocalTime WORK_START = LocalTime.parse("09:00:00", DateTimeFormatter.ofPattern("HH:mm:ss"));
             LocalTime WORK_END = LocalTime.parse("15:00:00", DateTimeFormatter.ofPattern("HH:mm:ss"));
             // Returns boolean if users time in working hours
             return WORK_START.isBefore(timeInLjubljana) && WORK_END.isAfter(timeInLjubljana);
-        }else{
+        } else {
             return false;
         }
     }
 
     /*
-     *  Name: isValidCountryCode
-     *  Checks if the string parameter cc is a valid  country code
+     * Name: isValidCountryCode Checks if the string parameter cc is a valid country
+     * code
      *
      * @param String cc - two or three letters country code
      *
@@ -203,8 +205,8 @@ public class EnableServices {
     }
 
     /*
-     * Name: isValidTimeZone
-     * Checks if the string parameter timezone is a valid timezone id.
+     * Name: isValidTimeZone Checks if the string parameter timezone is a valid
+     * timezone id.
      *
      * @param String timezone - (Example: Europe/London)
      *
@@ -213,6 +215,5 @@ public class EnableServices {
     public boolean isValidTimeZone(String timezone) {
         return Arrays.asList(TimeZone.getAvailableIDs()).contains(timezone);
     }
-
 
 }
